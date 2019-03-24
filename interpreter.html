@@ -1,0 +1,102 @@
+<html lang="ko"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>TTAKKKU</title>
+    <style>
+        textarea{
+            width: 100%;
+            height: 500px;
+        }
+    </style>
+</head>
+<body style="">
+    <h1>ttakkku</h1>
+    <div><textarea id="code" placeholder="코드를 여기에 적어주세요"></textarea>  </div>
+    <p id="result"></p> 
+    <button id="run" onclick="runCode()">실행하기</button>
+    
+<script>
+
+    var index = 0;
+    var code = document.getElementById("code");
+    var codeChar;
+    var ptr=0;
+    var memory = new Array(30000);
+    var outputString = "";
+    var loopStartPos = [0];
+    var loopEndPos = [0];
+    var keyInput=0;
+    var keyFlag = false;
+
+    function initMemory()
+    {
+        for(var i = 0;i < memory.length;i++){
+            memory[i] = 0;
+        }
+    }
+    function findLoop(){
+        for(var i = codeChar.length;i >= 0 ;i--){
+            if(codeChar[i] == '[')loopStartPos.push(i);
+            else if(codeChar[i] == ']')loopEndPos.push(i);
+        }
+    }
+    function decodeCode(cd)
+    {
+        var loopCnt = 0;
+        switch(cd){
+            case 't' : memory[ptr]++; if(memory[ptr]>0xFF)memory[ptr]=0x00;break;
+            case 'a' : memory[ptr]--; if(memory[ptr]<0)memory[ptr]=0xFF;break;
+            case '딱' : ptr++;break;
+            case '구' : ptr--;break;
+            case 'u' : outputString += (memory[ptr] == 10)? '<br>':(memory[ptr] == 32)? '&nbsp;':String.fromCharCode(memory[ptr]); break;
+            case '#' : memory[ptr]= prompt("").charCodeAt(0)&0xFF;break;
+            case '6' : 
+                if (memory[ptr] == 0){
+                    var num = 0;
+                    while (true){
+                        if (codeChar[++index] == '6')++num;
+                        else if (codeChar[index] == '1'){
+                            if (num == 0)break;
+                            --num;
+                        }
+                    }
+                }
+                break;
+            case '1' :
+                if (memory[ptr] != 0){
+                    var num = 0;
+                    while (true){
+                        if (codeChar[--index] == '1')++num;
+                        else if (codeChar[index] == '6'){
+                            if (num == 0){
+                                break;
+                            }
+                            --num;
+                        }
+                    }
+                }
+                break;
+            defaule : break;
+        }
+        
+    }
+    function runCode()
+    {
+        keyInput=0;
+        keyFlag = false;
+        index = 0;
+        ptr = 0;
+        codeChar = code.value.split("\n");
+        outputString = "";
+        initMemory();
+        for(index = 0;index < codeChar.length;index++){
+            decodeCode(codeChar[index]);
+        }
+        document.getElementById("result").innerHTML = outputString;
+    }
+
+</script>
+
+
+</body></html>
